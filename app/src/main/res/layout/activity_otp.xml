@@ -7,9 +7,10 @@
     android:background="#FFFFFF"
     tools:context="com.example.sai.girlstalk.OTP">
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
+        android:layout_width="80dp"
+        android:layout_height="90dp"
+        android:src="@mipmap/logo"
+        android:id="@+id/logo"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="12dp"/>
@@ -20,10 +21,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="99dp"
-        android:textColor="#000"
+        android:textColor="#fff"
+        android:textStyle="bold"
         android:text="Provide Phone no. with Country code"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#000"
+        android:layout_above="@+id/exampletxt"
+        android:layout_margin="10dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="italic"
+        android:text="For example .. +91123456789 (+91 is the country code and the rest is the phone number)"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:textAlignment="center"
+        android:id="@+id/exampletxt"
+        android:padding="10dp"/>
 
     <EditText
         android:id="@+id/Phonenoedittext"
@@ -45,7 +63,7 @@
         android:layout_below="@+id/Phonenoedittext"
         android:layout_marginTop="49dp"
         android:text="Send OTP"
-        android:background="@drawable/layout_back"
+        android:background="@drawable/round_btn"
         android:layout_alignLeft="@+id/Phonenoedittext"
         android:layout_alignStart="@+id/Phonenoedittext"
         android:layout_alignRight="@+id/Phonenoedittext"
@@ -68,46 +86,36 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <TextView
-                android:background="#4FC1E9"
-                android:id="@+id/textViewVerified"
-                android:padding="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="99dp"
-                android:textColor="#000"
-                android:visibility="gone"
-                android:text="Provide OTP in below text area to verify"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
 
-            <EditText
-                android:id="@+id/OTPeditText"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:visibility="gone"
-                android:layout_below="@+id/textViewVerified"
+            <com.github.loadingview.LoadingView
+                android:id="@+id/loadingView"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="41dp"
-                android:ems="10"
-                android:padding="10dp"
-                android:background="@drawable/edittext_bck"
-                android:inputType="phone"
-                android:hint="OTP Here ..."/>
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                app:lv_duration="30"
+                app:lv_end_color="@color/color_end"
+                app:lv_external_radius="24dp"
+                app:lv_internal_radius="4dp"
+                android:visibility="gone"
+                app:lv_start_color="@color/color_start" />
 
-            <Button
-                android:id="@+id/OTPVERIFY"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/OTPeditText"
-                android:layout_marginTop="49dp"
-                android:text="Verify"
+                android:text="Wait for your OTP...."
+                android:layout_below="@+id/loadingView"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#192A56"
+                android:fontFamily="@font/aclonica"
                 android:visibility="gone"
-                android:background="@drawable/layout_back"
-                android:layout_alignLeft="@+id/OTPeditText"
-                android:layout_alignStart="@+id/OTPeditText"
-                android:layout_alignRight="@+id/OTPeditText"
-                android:layout_alignEnd="@+id/OTPeditText" />
+                android:id="@+id/waittxt"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"/>
+
+
         </RelativeLayout>
     </FrameLayout>
 </RelativeLayout>

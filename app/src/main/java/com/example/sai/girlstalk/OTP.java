@@ -5,12 +5,14 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.github.loadingview.LoadingDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -22,37 +24,51 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
+
 public class OTP extends AppCompatActivity {
 
     private static final String TAG = "PhoneLogin";
     private boolean mVerificationInProgress = false;
     private String mVerificationId;
+    private TextView waitTxt;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private FirebaseAuth mAuth;
-    TextView t1,t2;
-    ImageView i1;
-    EditText e1,e2;
-    Button b1,b2;
+    TextView t1;
+    ImageView i1,i2;
+    LoadingDialog dialog;
+    private Animation bounceanime;
+    EditText e1;
+    Button b1;
+    private TextView exampleTxt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otp);
 
-        e1 = (EditText) findViewById(R.id.Phonenoedittext);
-        b1 = (Button) findViewById(R.id.PhoneVerify);
-        t1 = (TextView)findViewById(R.id.textView2Phone);
-        i1 = (ImageView)findViewById(R.id.imageView2Phone);
-        e2 = (EditText) findViewById(R.id.OTPeditText);
-        b2 = (Button)findViewById(R.id.OTPVERIFY);
-        t2 = (TextView)findViewById(R.id.textViewVerified);
+        exampleTxt = findViewById(R.id.exampletxt);
+        e1 =  findViewById(R.id.Phonenoedittext);
+        b1 = findViewById(R.id.PhoneVerify);
+        t1 = findViewById(R.id.textView2Phone);
+        i1 = findViewById(R.id.imageView2Phone);
+        i2 = findViewById(R.id.logo);
+        waitTxt = findViewById(R.id.waittxt);
+        bounceanime = AnimationUtils.loadAnimation(this,R.anim.bounce);
+        BounceInterpolar interpolator = new BounceInterpolar(0.2, 20);
+        bounceanime.setInterpolator(interpolator);
+        i2.startAnimation(bounceanime);
+        i2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i2.startAnimation(bounceanime);
+            }
+        });
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential) {
-                // Log.d(TAG, "onVerificationCompleted:" + credential);
                 mVerificationInProgress = false;
                 Toast.makeText(OTP.this,"Verification Complete",Toast.LENGTH_SHORT).show();
                 signInWithPhoneAuthCredential(credential);
@@ -60,12 +76,9 @@ public class OTP extends AppCompatActivity {
 
             @Override
             public void onVerificationFailed(FirebaseException e) {
-                // Log.w(TAG, "onVerificationFailed", e);
                 Toast.makeText(OTP.this,"Verification Failed",Toast.LENGTH_SHORT).show();
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                    // Invalid request
                     Toast.makeText(OTP.this,"InValid Phone Number",Toast.LENGTH_SHORT).show();
-                    // ...
                 } else if (e instanceof FirebaseTooManyRequestsException) {
                 }
 
@@ -74,7 +87,6 @@ public class OTP extends AppCompatActivity {
             @Override
             public void onCodeSent(String verificationId,
                                    PhoneAuthProvider.ForceResendingToken token) {
-                // Log.d(TAG, "onCodeSent:" + verificationId);
                 Toast.makeText(OTP.this,"Verification code has been send on your number",Toast.LENGTH_SHORT).show();
                 // Save verification ID and resending token so we can use them later
                 mVerificationId = verificationId;
@@ -83,33 +95,37 @@ public class OTP extends AppCompatActivity {
                 b1.setVisibility(View.GONE);
                 t1.setVisibility(View.GONE);
                 i1.setVisibility(View.GONE);
-                t2.setVisibility(View.VISIBLE);
-                e2.setVisibility(View.VISIBLE);
-                b2.setVisibility(View.VISIBLE);
-                // ...
+                i2.setVisibility(View.GONE);
+                exampleTxt.setVisibility(View.GONE);
+                waitTxt.setVisibility(View.VISIBLE);
+                dialog= LoadingDialog.Companion.get(OTP.this).show();
+
             }
         };
 
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                        e1.getText().toString(),
-                        60,
-                        java.util.concurrent.TimeUnit.SECONDS,
-                        OTP.this,
-                        mCallbacks);
+
+                if(e1.getText().toString().isEmpty()){
+                    Toast.makeText(OTP.this, "Enter phone number!", Toast.LENGTH_SHORT).show();
+                }
+
+                    PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                            e1.getText().toString(),
+                            60,
+                            java.util.concurrent.TimeUnit.SECONDS,
+                            OTP.this,
+                            mCallbacks);
+
+
             }
         });
 
-        b2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, e2.getText().toString());
-                // [END verify_with_code]
-                signInWithPhoneAuthCredential(credential);
-            }
-        });
+//
+//                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, e2.getText().toString());
+//                // [END verify_with_code]
+//                signInWithPhoneAuthCredential(credential);
 
 
     }
@@ -120,15 +136,22 @@ public class OTP extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Log.d(TAG, "signInWithCredential:success");
-                            startActivity(new Intent(OTP.this,MainActivity.class));
+                            startActivity(new Intent(OTP.this,login1.class));
                             Toast.makeText(OTP.this,"Verification Done",Toast.LENGTH_SHORT).show();
-                            // ...
+                            dialog.hide();
+                            finish();
                         } else {
-                            // Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The verification code entered was invalid
                                 Toast.makeText(OTP.this,"Invalid Verification",Toast.LENGTH_SHORT).show();
+                                dialog.hide();
+                                e1.setVisibility(View.VISIBLE);
+                                b1.setVisibility(View.VISIBLE);
+                                t1.setVisibility(View.VISIBLE);
+                                i1.setVisibility(View.VISIBLE);
+                                i2.setVisibility(View.VISIBLE);
+                                waitTxt.setVisibility(View.GONE);
+
                             }
                         }
                     }

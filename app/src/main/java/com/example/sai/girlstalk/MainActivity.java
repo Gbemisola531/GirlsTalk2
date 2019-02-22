@@ -1,8 +1,14 @@
 package com.example.sai.girlstalk;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,62 +18,83 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import com.example.sai.girlstalk.GroupModel;
+import com.example.sai.girlstalk.R;
+import com.example.sai.girlstalk.StoryModel;
+import com.example.sai.girlstalk.login1;
 
-    private NavigationView navigationView;
-    SearchView searchView;
-    private int[] images = {R.drawable.mygroup,R.drawable.join,R.drawable.groupdisc,R.drawable.earn,R.drawable.popular,R.drawable.expert};
-    private String[] texts = {"My Groups","Join a Group","Girls Room","Show and Earn","Popular Stories","Ask an Expert"};
-    private String[] textDesc ={"See what's going on in your joined groups","Join a desired group to get connected with new people","You can ask questions and give answers to other girls","Showcase your skills and earn through them","See what's on trending","Ask questions to take help from the experts"};
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        RecyclerView storyRecycler = findViewById(R.id.storyRecycler);
+        RecyclerView groupRecycler =findViewById(R.id.groupsRecycler);
+        RecyclerView expertsRecycler = findViewById(R.id.expertsRecycler);
+
+        ArrayList<StoryModel> storylist = new ArrayList<>();
+        ArrayList<GroupModel> groupList = new ArrayList<>();
+        ArrayList<StoryModel> expertList = new ArrayList<>();
         setSupportActionBar(toolbar);
-
-        ListView myList = findViewById(R.id.mlist);
-         searchView = findViewById(R.id.search_bar);
-
-        searchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.setIconified(false);
-            }
-        });
+        toolbar.getOverflowIcon().setColorFilter(ContextCompat.getColor(this,R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Our ChatBot is under construction", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setItemIconTintList(null);
 
-        CustomAdapter customAdapter = new CustomAdapter();
-        myList.setAdapter(customAdapter);
+
+        storylist.add(new StoryModel("https://gobehere.com/wp-content/uploads/2017/10/Screen-Shot-2017-10-31-at-3.05.18-PM-min-2-e1510239997946.png",
+                "Ami Lee’s story about taking a huge risk and falling in love with her life again"));
+        storylist.add(new StoryModel("https://blogs.kent.ac.uk/kent-business-matters/files/2016/04/malala.jpg","Satuu drs hf drgd dtte hteyh"));
+        storylist.add(new StoryModel("https://www.gcsp.ch/var/ezdemo_site/storage/images/courses/inspiring-women-leaders-2018/167943-1-eng-EU/Inspiring-Women-Leaders-2018_gallerylarge.jpg"
+                ,"Inspiring story"));
+        storylist.add(new StoryModel("https://alshindagah.com/images/article/d907c225-1f74-4c9b-9e6d-be556a96dae9.jpg","Uarr djytety jydyted  hdh"));
+
+        storyRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
+        storyRecycler.setAdapter(new StoryRecyclerAdapter(storylist,this));
+
+        groupList.add(new GroupModel("https://www.anikatherapeutics.com/assets/iStock_000020443536XLarge-e1411673189414.jpg","855",
+                "Delhi","Women Rights"));
+
+        groupList.add(new GroupModel("https://www.jetairways.com/Images/forms/group-booking.jpg","235",
+                "Chennai","Online Job For Women"));
+
+        groupList.add(new GroupModel("https://static.independent.co.uk/s3fs-public/thumbnails/image/2017/06/09/11/group-photos-need-to-die.jpg?w968h681","235",
+                "Kolkata","Local Friends"));
+
+        //  groupList.add(new GroupModel("https://www.jetairways.com/Images/forms/group-booking.jpg","235",
+        //"Chennai","Online Job For Women"));
+        groupRecycler.setAdapter(new GroupRecyclerAdapter(groupList,this));
+        groupRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+        expertList.add(new StoryModel("https://static.boredpanda.com/blog/wp-content/uploads/2017/08/Epic-Portraits-Shot-with-an-iPhone-and-a-Big-Mac-59a54f2641195__880.jpg","ABC Kumar"));
+        expertList.add(new StoryModel("http://www.keatleyphoto.com/wp-content/uploads/2016/03/John_Keatley_iPhone_portrait_Andrew_5055.jpg","XYZ Kumar"));
+        expertList.add(new StoryModel("http://farm3.static.flickr.com/2792/4285995840_72a6e4ff43.jpg","Taru Sart"));
+
+        expertsRecycler.setAdapter(new ExpertRecyclerAdapter(expertList,this));
+        expertsRecycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+
     }
-
 
     @Override
     public void onBackPressed() {
@@ -109,9 +136,13 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+
+            startActivity(new Intent(MainActivity.this,login1.class));
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_create_group) {
 
         } else if (id == R.id.nav_share) {
 
@@ -123,37 +154,4 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    class CustomAdapter extends BaseAdapter{
-
-        @Override
-        public int getCount() {
-            return images.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            convertView = getLayoutInflater().inflate(R.layout.custom_list,null);
-            ImageView imageView = convertView.findViewById(R.id.mIcon);
-            TextView mText = convertView.findViewById(R.id.mtext);
-            TextView mDescript = convertView.findViewById(R.id.mDescText);
-
-            imageView.setImageResource(images[position]);
-            mText.setText(texts[position]);
-            mDescript.setText(textDesc[position]);
-            return convertView;
-        }
-    }
-
-
-
 }

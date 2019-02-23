@@ -7,20 +7,26 @@
     android:background="#FFFFFF"
     tools:context="com.example.sai.girlstalk.OTP">
     <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/uppper"
+        android:layout_marginRight="20dp"
+        android:id="@+id/upper"/>
+    <ImageView
         android:layout_width="80dp"
         android:layout_height="90dp"
         android:src="@mipmap/logo"
         android:id="@+id/logo"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="32dp"/>
     <TextView
         android:background="#4FC1E9"
         android:id="@+id/textView2Phone"
         android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="99dp"
+        android:layout_marginTop="120dp"
         android:textColor="#fff"
         android:textStyle="bold"
         android:text="Provide Phone no. with Country code"
@@ -61,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/Phonenoedittext"
-        android:layout_marginTop="49dp"
+        android:layout_marginTop="35dp"
         android:text="Send OTP"
         android:background="@drawable/round_btn"
         android:layout_alignLeft="@+id/Phonenoedittext"

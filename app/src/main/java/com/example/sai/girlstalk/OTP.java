@@ -1,6 +1,7 @@
 package com.example.sai.girlstalk;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.github.loadingview.LoadingDialog;
+import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -34,18 +36,29 @@ public class OTP extends AppCompatActivity {
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private FirebaseAuth mAuth;
-    TextView t1;
-    ImageView i1,i2;
-    LoadingDialog dialog;
+    private TextView t1;
+    private ImageView i1,i2;
+    private LoadingDialog dialog;
     private Animation bounceanime;
-    EditText e1;
-    Button b1;
+    private EditText e1;
+    private Button b1;
+    private boolean isFirstRun=true;
     private TextView exampleTxt;
+    private SharedPreferences preferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otp);
 
+        // getting first run boolean value(false) after 1st run
+        SharedPreferences getpref = getSharedPreferences("FIRST_RUN",MODE_PRIVATE);
+        isFirstRun = getpref.getBoolean("checkrunstatus",true);
+
+        if(!isFirstRun){  // if its not the 1st run
+            Intent intent = new Intent(OTP.this,login1.class);
+            startActivity(intent);
+            finish();
+        }
         exampleTxt = findViewById(R.id.exampletxt);
         e1 =  findViewById(R.id.Phonenoedittext);
         b1 = findViewById(R.id.PhoneVerify);
@@ -63,8 +76,10 @@ public class OTP extends AppCompatActivity {
                 i2.startAnimation(bounceanime);
             }
         });
+
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
+
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
             @Override
@@ -76,10 +91,11 @@ public class OTP extends AppCompatActivity {
 
             @Override
             public void onVerificationFailed(FirebaseException e) {
-                Toast.makeText(OTP.this,"Verification Failed",Toast.LENGTH_SHORT).show();
+                Toast.makeText(OTP.this,"Verification Failed! Try again..",Toast.LENGTH_SHORT).show();
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     Toast.makeText(OTP.this,"InValid Phone Number",Toast.LENGTH_SHORT).show();
                 } else if (e instanceof FirebaseTooManyRequestsException) {
+                    Toast.makeText(OTP.this, "Something went wong...please try again", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -93,7 +109,7 @@ public class OTP extends AppCompatActivity {
                 mResendToken = token;
                 e1.setVisibility(View.GONE);
                 b1.setVisibility(View.GONE);
-                t1.setVisibility(View.GONE);
+                t1.setVisibility(View.GONE);  // making some elements as invisible and some visible
                 i1.setVisibility(View.GONE);
                 i2.setVisibility(View.GONE);
                 exampleTxt.setVisibility(View.GONE);
@@ -116,17 +132,11 @@ public class OTP extends AppCompatActivity {
                             60,
                             java.util.concurrent.TimeUnit.SECONDS,
                             OTP.this,
-                            mCallbacks);
+                            mCallbacks);   // this wil verify phone number
 
 
             }
         });
-
-//
-//                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, e2.getText().toString());
-//                // [END verify_with_code]
-//                signInWithPhoneAuthCredential(credential);
-
 
     }
 
@@ -139,6 +149,15 @@ public class OTP extends AppCompatActivity {
                             startActivity(new Intent(OTP.this,login1.class));
                             Toast.makeText(OTP.this,"Verification Done",Toast.LENGTH_SHORT).show();
                             dialog.hide();
+
+
+                            // saving status of first run as false if the task is successful.
+                            preferences = getSharedPreferences("FIRST_RUN",MODE_PRIVATE);
+                            isFirstRun = false;
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putBoolean("checkrunstatus",isFirstRun);
+                            editor.apply();
+
                             finish();
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {

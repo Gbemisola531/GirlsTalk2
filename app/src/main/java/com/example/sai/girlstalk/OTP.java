@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.github.loadingview.LoadingDialog;
-import com.google.android.gms.common.util.SharedPreferencesUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -29,9 +28,9 @@ import com.google.firebase.auth.PhoneAuthProvider;
 
 public class OTP extends AppCompatActivity {
 
-    private static final String TAG = "PhoneLogin";
     private boolean mVerificationInProgress = false;
     private String mVerificationId;
+    private View parentlayout;
     private TextView waitTxt;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
@@ -39,7 +38,7 @@ public class OTP extends AppCompatActivity {
     private TextView t1;
     private ImageView i1,i2;
     private LoadingDialog dialog;
-    private Animation bounceanime;
+    private Animation bounceanime,moveanime;
     private EditText e1;
     private Button b1;
     private boolean isFirstRun=true;
@@ -55,10 +54,11 @@ public class OTP extends AppCompatActivity {
         isFirstRun = getpref.getBoolean("checkrunstatus",true);
 
         if(!isFirstRun){  // if its not the 1st run
-            Intent intent = new Intent(OTP.this,login1.class);
+            Intent intent = new Intent(OTP.this,Login.class);
             startActivity(intent);
             finish();
         }
+        parentlayout = findViewById(android.R.id.content);
         exampleTxt = findViewById(R.id.exampletxt);
         e1 =  findViewById(R.id.Phonenoedittext);
         b1 = findViewById(R.id.PhoneVerify);
@@ -67,6 +67,7 @@ public class OTP extends AppCompatActivity {
         i2 = findViewById(R.id.logo);
         waitTxt = findViewById(R.id.waittxt);
         bounceanime = AnimationUtils.loadAnimation(this,R.anim.bounce);
+        moveanime = AnimationUtils.loadAnimation(this,R.anim.down);
         BounceInterpolar interpolator = new BounceInterpolar(0.2, 20);
         bounceanime.setInterpolator(interpolator);
         i2.startAnimation(bounceanime);
@@ -114,6 +115,8 @@ public class OTP extends AppCompatActivity {
                 i2.setVisibility(View.GONE);
                 exampleTxt.setVisibility(View.GONE);
                 waitTxt.setVisibility(View.VISIBLE);
+                waitTxt.startAnimation(moveanime);
+
                 dialog= LoadingDialog.Companion.get(OTP.this).show();
 
             }
@@ -146,8 +149,7 @@ public class OTP extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            startActivity(new Intent(OTP.this,login1.class));
-                            Toast.makeText(OTP.this,"Verification Done",Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(OTP.this,Login.class));
                             dialog.hide();
 
 

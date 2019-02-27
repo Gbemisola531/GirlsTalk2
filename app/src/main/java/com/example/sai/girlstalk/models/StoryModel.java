@@ -1,8 +1,8 @@
-package com.example.sai.girlstalk;
+package com.example.sai.girlstalk.models;
 
 public class StoryModel {
 
-    String thumbnailUrl, title;
+    private String thumbnailUrl, title;
 
     public StoryModel(String thumbnailUrl, String title) {
         this.thumbnailUrl = thumbnailUrl;

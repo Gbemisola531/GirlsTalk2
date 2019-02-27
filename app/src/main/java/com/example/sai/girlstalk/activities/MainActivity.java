@@ -1,4 +1,4 @@
-package com.example.sai.girlstalk;
+package com.example.sai.girlstalk.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +20,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.sai.girlstalk.adapters.ExpertRecyclerAdapter;
+import com.example.sai.girlstalk.models.GroupModel;
+import com.example.sai.girlstalk.adapters.GroupRecyclerAdapter;
+import com.example.sai.girlstalk.R;
+import com.example.sai.girlstalk.models.StoryModel;
+import com.example.sai.girlstalk.adapters.StoryRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -44,12 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar.getOverflowIcon().setColorFilter(ContextCompat.getColor(this,R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Chatbot under constrution!", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            }
-        });
+        fab.setOnClickListener(view -> Snackbar.make(view, "Chatbot under constrution!", Snackbar.LENGTH_LONG).setAction("Action", null).show());
 
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             FirebaseAuth.getInstance().signOut();
-                            Intent intent = new Intent(MainActivity.this,Login.class);
+                            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
                             startActivity(intent);
                             Toast.makeText(MainActivity.this, "You are signed out!", Toast.LENGTH_SHORT).show();
                             finish();

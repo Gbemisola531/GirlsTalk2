@@ -1,4 +1,4 @@
-package com.example.sai.girlstalk;
+package com.example.sai.girlstalk.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,12 +11,16 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import com.example.sai.girlstalk.R;
+import com.example.sai.girlstalk.models.StoryModel;
+
 import java.util.ArrayList;
 
-public class StoryRecyclerAdapter extends RecyclerView.Adapter<StoryRecyclerAdapter.ViewHolder> {
+public class StoryRecyclerAdapter extends RecyclerView.Adapter<StoryRecyclerAdapter.ViewHolder>
+{
 
-    ArrayList<StoryModel> list;
-    Context mContext;
+    private ArrayList<StoryModel> list;
+    private Context mContext;
 
     public StoryRecyclerAdapter(ArrayList<StoryModel> list, Context context) {
         this.list = list;
@@ -26,7 +30,6 @@ public class StoryRecyclerAdapter extends RecyclerView.Adapter<StoryRecyclerAdap
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-
         LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
         View view = layoutInflater.inflate(R.layout.stories_row,viewGroup,false);
         return new ViewHolder(view);
@@ -35,25 +38,19 @@ public class StoryRecyclerAdapter extends RecyclerView.Adapter<StoryRecyclerAdap
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         StoryModel current = list.get(i);
-        Glide
-                .with(mContext)
-                .load(current.getThumbnailUrl())
-                .centerCrop()
-                .into(viewHolder.thumbnail);
+        Glide.with(mContext).load(current.getThumbnailUrl())
+                .centerCrop().into(viewHolder.thumbnail);
 
         viewHolder.title.setText(current.getTitle());
-
     }
 
     @Override
-    public int getItemCount() {
-        return list.size();
-    }
+    public int getItemCount() { return list.size(); }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         ImageView thumbnail;
         TextView title;
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             thumbnail = itemView.findViewById(R.id.storyThumbnail);

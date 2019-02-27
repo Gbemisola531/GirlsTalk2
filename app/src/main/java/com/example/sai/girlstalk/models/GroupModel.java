@@ -1,8 +1,11 @@
-package com.example.sai.girlstalk;
+package com.example.sai.girlstalk.models;
 
 public class GroupModel {
 
-    String groupIcon,groupMembers, groupLocation,groupTitle;
+    private String groupIcon;
+    private String groupMembers;
+    public String groupLocation;
+    private String groupTitle;
 
     public String getGroupIcon() {
         return groupIcon;

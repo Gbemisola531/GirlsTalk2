@@ -1,8 +1,11 @@
 package com.example.sai.girlstalk.repositories;
 
+import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.widget.Toast;
 
+import com.example.sai.girlstalk.models.User;
 import com.example.sai.girlstalk.utils.FirebaseUtils;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -14,13 +17,15 @@ import java.util.Objects;
 public class UserRepository {
     private FirebaseUtils firebaseUtils;
     private static UserRepository userRepository;
+    private Application application;
 
-    private UserRepository() {
+    private UserRepository(Application application) {
         firebaseUtils = FirebaseUtils.getInstance();
+        this.application = application;
     }
 
-    public static UserRepository getInstance() {
-        if (userRepository == null) userRepository = new UserRepository();
+    public static UserRepository getInstance(Application application) {
+        if (userRepository == null) userRepository = new UserRepository(application);
         return userRepository;
     }
 
@@ -33,13 +38,57 @@ public class UserRepository {
         return result;
     }
 
-    public LiveData<String> signIn(String email, String password) {
-        MutableLiveData<String> result = new MutableLiveData<>();
+    public LiveData<Boolean> logIn(String email, String password) {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
         firebaseUtils.getAuthInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(task ->
         {
-            if (task.isSuccessful()) result.setValue(" ");
-            else result.setValue(Objects.requireNonNull(task.getException()).getMessage());
+            if (task.isSuccessful()) if (Objects.requireNonNull(firebaseUtils.getAuthInstance().getCurrentUser()).isEmailVerified())
+                    result.setValue(true);
+            else {
+                firebaseUtils.getAuthInstance().signOut();
+                result.setValue(false); }
+            else {
+                result.setValue(false);
+                Toast.makeText(application, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
         return result;
     }
+
+    public LiveData<Boolean> signUp(User newUser) {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+
+        firebaseUtils.getAuthInstance().createUserWithEmailAndPassword(newUser.getEmail(), newUser.getPassword()).addOnCompleteListener(task ->
+        {
+            if (task.isSuccessful())
+                Objects.requireNonNull(firebaseUtils.getAuthInstance().getCurrentUser()).sendEmailVerification().addOnCompleteListener(emailResult ->
+                {
+                    if (emailResult.isSuccessful())
+                    {
+                        firebaseUtils.getDbInstance().collection("Users").add(newUser).addOnCompleteListener(addResult ->
+                        {
+                            if (addResult.isSuccessful())
+                            {
+                                firebaseUtils.getAuthInstance().signOut();
+                                result.setValue(true);
+                            }
+                            else {
+                                Objects.requireNonNull(firebaseUtils.getAuthInstance().getCurrentUser()).delete();
+                                firebaseUtils.getAuthInstance().signOut();
+                                result.setValue(false);
+                            }
+                        });
+                    }
+                    else {
+                        Objects.requireNonNull(firebaseUtils.getAuthInstance().getCurrentUser()).delete();
+                        firebaseUtils.getAuthInstance().signOut();
+                        result.setValue(false);
+                    }
+                });
+            else result.setValue(false);
+        });
+        return result;
+    }
+
+
 }

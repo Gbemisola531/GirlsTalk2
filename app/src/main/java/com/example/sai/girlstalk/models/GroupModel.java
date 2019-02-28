@@ -4,7 +4,7 @@ public class GroupModel {
 
     private String groupIcon;
     private String groupMembers;
-    public String groupLocation;
+    private String groupLocation;
     private String groupTitle;
 
     public String getGroupIcon() {

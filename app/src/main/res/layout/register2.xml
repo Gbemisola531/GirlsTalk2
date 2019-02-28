@@ -24,7 +24,7 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/input1"
+            android:id="@+id/signUpEmailParent"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -34,23 +34,23 @@
                 android:layout_height="30sp"
                 android:src="@drawable/line"/>
 
-        <EditText
-            android:textSize="16dp"
-            android:textColorHint="@color/colorPrimaryDark"
-            android:translationX="-5dp"
-            android:padding="8sp"
-            android:id="@+id/mail"
-            android:hint="Enter Email..."
-            android:drawableLeft="@drawable/ic_email_black_24dp"
-            android:drawablePadding="10dp"
-            android:background="@drawable/inputbg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <EditText
+                android:textSize="16sp"
+                android:textColorHint="@color/colorPrimaryDark"
+                android:translationX="-5dp"
+                android:padding="8sp"
+                android:id="@+id/signUpEmail"
+                android:hint="Enter Email..."
+                android:drawableStart="@drawable/ic_email_black_24dp"
+                android:drawablePadding="10dp"
+                android:background="@drawable/inputbg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/input2"
+            android:id="@+id/signUpPasswordParent"
             android:layout_marginTop="10sp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                 android:textColorHint="@color/colorPrimaryDark"
                 android:translationX="-5dp"
                 android:padding="8sp"
-                android:id="@+id/pass1"
+                android:id="@+id/signUpPassword"
                 android:hint="Enter Password..."
                 android:drawableLeft="@drawable/ic_lock_black_24dp"
                 android:drawablePadding="10dp"
@@ -77,10 +77,8 @@
 
         </LinearLayout>
 
-
-
         <LinearLayout
-            android:id="@+id/input3"
+            android:id="@+id/signUpConfirmPasswordParent"
             android:layout_marginTop="10sp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -97,7 +95,7 @@
                 android:textColorHint="@color/colorPrimaryDark"
                 android:translationX="-5dp"
                 android:padding="8sp"
-                android:id="@+id/pass2"
+                android:id="@+id/signUpConfirmPassword"
                 android:drawableLeft="@drawable/ic_loop_black_24dp"
                 android:drawablePadding="10dp"
                 android:hint="Enter Password again to confirm..."
@@ -106,8 +104,6 @@
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
-
-
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/faBtnlg2"

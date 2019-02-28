@@ -1,63 +1,68 @@
 package com.example.sai.girlstalk.activities;
 
-import android.content.Intent;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.sai.girlstalk.R;
+import com.example.sai.girlstalk.models.User;
+import com.example.sai.girlstalk.viewModels.UserViewModel;
 
 public class Register2 extends AppCompatActivity {
 
-    TextView name;
-    LinearLayout input1, input2, input3;
-    Animation slideleft, slideright;
-    private EditText pass, confirmpass;
-    FloatingActionButton mFloatingActionButton;
+    private EditText password, confirmPassword, email;
+
+    private UserViewModel userViewModel;
+    private String usernameText;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register2);
 
-        name = findViewById(R.id.name);
-        input1 = findViewById(R.id.input1);
-        input2 = findViewById(R.id.input2);
-        input3 = findViewById(R.id.input3);
-        pass = findViewById(R.id.pass1);
-        confirmpass = findViewById(R.id.pass2);
+        TextView name = findViewById(R.id.name);
+        password = findViewById(R.id.signUpPassword);
+        confirmPassword = findViewById(R.id.signUpConfirmPassword);
+        email = findViewById(R.id.signUpEmail);
 
-        mFloatingActionButton = findViewById(R.id.faBtnlg2);
+        userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
         String nameTxt = getIntent().getStringExtra("name");
+        usernameText = getIntent().getStringExtra("name");
 
         if (nameTxt.length() > 6) nameTxt = nameTxt.substring(0, 6) + "...";
 
-        slideleft = AnimationUtils.loadAnimation(this, R.anim.slideleft);
-        slideright = AnimationUtils.loadAnimation(this, R.anim.slideright);
-
-        input1.setAnimation(slideleft);
-        input2.setAnimation(slideleft);
-        input3.setAnimation(slideleft);
+        findViewById(R.id.signUpPasswordParent).setAnimation(AnimationUtils.loadAnimation(this, R.anim.slideleft));
+        findViewById(R.id.signUpEmailParent).setAnimation(AnimationUtils.loadAnimation(this, R.anim.slideleft));
+        findViewById(R.id.signUpConfirmPasswordParent).setAnimation(AnimationUtils.loadAnimation(this, R.anim.slideleft));
 
         name.setText(String.format("Hi, %s !", nameTxt));
-        name.setAnimation(slideright);
+        name.setAnimation(AnimationUtils.loadAnimation(this, R.anim.slideright));
 
-        mFloatingActionButton.setOnClickListener(v ->
+        findViewById(R.id.faBtnlg2).setOnClickListener(v ->
         {
-            if (!pass.getText().toString().equals(confirmpass.getText().toString()))
-                Snackbar.make(v, "Passwords do not match!", Snackbar.LENGTH_SHORT).show();
-            else if (pass.getText().toString().isEmpty() || confirmpass.getText().toString().isEmpty())
+            String passwordText = password.getText().toString();
+            String emailText = email.getText().toString();
+            String confirmPasswordText = confirmPassword.getText().toString();
+
+            if (passwordText.isEmpty() || confirmPasswordText.isEmpty() || usernameText.isEmpty() || emailText.isEmpty())
                 Snackbar.make(v, "Empty fields!", Snackbar.LENGTH_SHORT).show();
-            else startActivity(new Intent(Register2.this, MainActivity.class));
-            finish();
+            else if (!passwordText.equals(confirmPasswordText))
+                Snackbar.make(v, "Passwords do not match!", Snackbar.LENGTH_SHORT).show();
+            else
+                userViewModel.signUp(new User(usernameText, emailText, passwordText)).observe(this, isSuccessful ->
+                {
+                    if (isSuccessful != null) if (isSuccessful) {
+                        Toast.makeText(this, "A Confirmation Email Has Been Sent To You", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else
+                        Toast.makeText(this, "An Error Occurred Please Try Again", Toast.LENGTH_SHORT).show();
+                });
         });
     }
 }

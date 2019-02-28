@@ -77,12 +77,12 @@ public class OTPActivity extends AppCompatActivity {
                 Toast.makeText(OTPActivity.this, "Verification Complete", Toast.LENGTH_SHORT).show();
                 mAuth.signInWithCredential(credential).addOnCompleteListener(OTPActivity.this, task -> {
                     if (task.isSuccessful()) {
-                        startActivity(new Intent(OTPActivity.this, LoginActivity.class));
                         dialog.hide();
                         // saving status of first run as false if the task is successful.
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putBoolean("checkrunstatus", false);
                         editor.apply();
+                        startActivity(new Intent(OTPActivity.this, LoginActivity.class));
                         finish();
                     } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                         // The verification code entered was invalid

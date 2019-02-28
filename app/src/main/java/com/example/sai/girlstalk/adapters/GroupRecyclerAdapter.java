@@ -40,7 +40,7 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
         Glide.with(mContext).load(current.getGroupIcon()).into(viewHolder.gropThumbnail);
         viewHolder.groupTitle.setText(current.getGroupTitle());
         viewHolder.groupMembers.setText("Members: " + current.getGroupMembers());
-        viewHolder.groupLocation.setText("Location: " + current.groupLocation);
+        viewHolder.groupLocation.setText("Location: " + current.getGroupLocation());
     }
 
     @Override

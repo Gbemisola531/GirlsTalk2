@@ -29,4 +29,8 @@ public class UserViewModel extends AndroidViewModel {
     public LiveData<Boolean> signUp(User newUser) {
         return userRepository.signUp(newUser);
     }
+
+    public LiveData<Boolean> resetPassword(String email) {
+        return userRepository.resetPassword(email);
+    }
 }

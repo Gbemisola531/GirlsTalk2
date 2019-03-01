@@ -90,5 +90,19 @@ public class UserRepository {
         return result;
     }
 
+    public LiveData<Boolean> resetPassword(String email)
+    {
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+        firebaseUtils.getAuthInstance().sendPasswordResetEmail(email).addOnCompleteListener(task ->
+        {
+            if (task.isSuccessful()) result.setValue(true);
+            else {
+                Toast.makeText(application, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
+                result.setValue(false);
+            }
+        });
+        return result;
+    }
+
 
 }

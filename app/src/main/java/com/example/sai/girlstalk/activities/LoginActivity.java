@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.sai.girlstalk.R;
+import com.example.sai.girlstalk.dialogs.ForgotPasswordDialog;
 import com.example.sai.girlstalk.viewModels.UserViewModel;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,8 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient googleSignInClient;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -52,6 +52,9 @@ public class LoginActivity extends AppCompatActivity {
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         findViewById(R.id.googleLoginBtn).setOnClickListener(v -> startActivityForResult(googleSignInClient.getSignInIntent(), 101));
+        findViewById(R.id.forgotPasswordText).setOnClickListener(v -> {
+            new ForgotPasswordDialog().show(getSupportFragmentManager(), "Forgot Password");
+        });
     }
 
     private void userLogin() {
@@ -78,8 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         userViewModel.logIn(email, password).observe(this, isSuccessful ->
         {
             loginProgress.setVisibility(View.GONE);
-            if (isSuccessful != null) if (isSuccessful)
-            {
+            if (isSuccessful != null) if (isSuccessful) {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);

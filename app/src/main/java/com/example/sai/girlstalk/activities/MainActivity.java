@@ -1,5 +1,6 @@
 package com.example.sai.girlstalk.activities;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -21,16 +22,19 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.sai.girlstalk.adapters.ExpertRecyclerAdapter;
+import com.example.sai.girlstalk.models.Group;
 import com.example.sai.girlstalk.models.GroupModel;
 import com.example.sai.girlstalk.adapters.GroupRecyclerAdapter;
 import com.example.sai.girlstalk.R;
 import com.example.sai.girlstalk.models.StoryModel;
 import com.example.sai.girlstalk.adapters.StoryRecyclerAdapter;
+import com.example.sai.girlstalk.viewModels.GroupViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
+{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +94,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         expertsRecycler.setAdapter(new ExpertRecyclerAdapter(expertList,this));
         expertsRecycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+
+        GroupViewModel groupViewModel = ViewModelProviders.of(this).get(GroupViewModel.class);
+        groupViewModel.createGroup(new Group("Sage Art","NAni","I Have Sharingan")).observe(this, isSuccessful ->
+        {
+            if (isSuccessful != null) if (isSuccessful)
+                Toast.makeText(getApplicationContext(),"Done",Toast.LENGTH_LONG).show();
+            else Toast.makeText(this, "I Failed Sigh", Toast.LENGTH_SHORT).show();
+
+        });
 
     }
 

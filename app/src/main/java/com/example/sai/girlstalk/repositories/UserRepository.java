@@ -58,7 +58,7 @@ public class UserRepository {
     public LiveData<Boolean> signUp(User newUser) {
         MutableLiveData<Boolean> result = new MutableLiveData<>();
 
-        firebaseUtils.getAuthInstance().createUserWithEmailAndPassword(newUser.getEmail(), newUser.getPassword()).addOnCompleteListener(task ->
+        firebaseUtils.getAuthInstance().createUserWithEmailAndPassword(newUser.getProfile().getEmail(), newUser.getPassword()).addOnCompleteListener(task ->
         {
             if (task.isSuccessful())
                 Objects.requireNonNull(firebaseUtils.getAuthInstance().getCurrentUser()).sendEmailVerification().addOnCompleteListener(emailResult ->
@@ -100,6 +100,19 @@ public class UserRepository {
                 Toast.makeText(application, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
                 result.setValue(false);
             }
+        });
+        return result;
+    }
+
+    public LiveData<User> getUser(String email)
+    {
+        MutableLiveData<User> result = new MutableLiveData<>();
+
+        firebaseUtils.getDbInstance().collection("Users").whereEqualTo("profile .email",email)
+                .get().addOnCompleteListener(task ->
+        {
+            if (task.isSuccessful()) result.setValue(task.getResult().getDocuments().get(0).toObject(User.class));
+            else result.setValue(null);
         });
         return result;
     }

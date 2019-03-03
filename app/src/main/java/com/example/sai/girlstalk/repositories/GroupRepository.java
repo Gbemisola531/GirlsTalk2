@@ -10,6 +10,7 @@ import com.example.sai.girlstalk.models.UserProfile;
 import com.example.sai.girlstalk.utils.FirebaseUtils;
 
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class GroupRepository
     private final String GROUP_COLLECTION_NAME = "Groups";
     private final String GROUP_COLLECTION_TITLE = "title";
     private final String GROUP_COLLECTION_MESSAGE = "messages";
-    private final String GROUP_COLLECTION_MEMBERS= "members";
+    //private final String GROUP_COLLECTION_MEMBERS= "members";
 
     private GroupRepository(Application application) {
         firebaseUtils = FirebaseUtils.getInstance();
@@ -84,9 +85,19 @@ public class GroupRepository
         {
             if (task.isSuccessful())
             {
-                CollectionReference groupMembers = Objects.requireNonNull(task.getResult())
-                        .getDocuments().get(0).getReference().collection(GROUP_COLLECTION_MEMBERS);
-                groupMembers.add(userProfile).addOnCompleteListener(addTask -> result.setValue(addTask.isSuccessful()));
+                DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+                Group group = documentSnapshot.toObject(Group.class);
+                group.getMembers().add(userProfile);
+
+                task.getResult().getDocuments().get(0).getReference().delete().addOnCompleteListener(deleteTask ->
+                {
+                    if (deleteTask.isSuccessful())
+                    {
+                        firebaseUtils.getDbInstance().collection(GROUP_COLLECTION_NAME).add(group).addOnCompleteListener(addTask ->
+                                result.setValue(addTask.isSuccessful()));
+                    }
+                    else result.setValue(false);
+                });
             } else result.setValue(false);
         });
         return result;
@@ -146,25 +157,29 @@ public class GroupRepository
         firebaseUtils.getDbInstance().collection(GROUP_COLLECTION_NAME).whereEqualTo(GROUP_COLLECTION_TITLE, groupTitle).get()
                 .addOnCompleteListener(task ->
         {
+           if (task.isSuccessful())
+           {
+               Group group = task.getResult().getDocuments().get(0).toObject(Group.class);
+               result.setValue(group.getMembers());
+           }
+           else result.setValue(null);
+        });
+        return result;
+    }
+
+    public LiveData<List<Group>> getUserGroups(UserProfile userProfile)
+    {
+        MutableLiveData<List<Group>> result = new MutableLiveData<>();
+        firebaseUtils.getDbInstance().collection(GROUP_COLLECTION_NAME).whereArrayContains("members",userProfile).get().addOnCompleteListener(task ->
+        {
             if (task.isSuccessful())
             {
-                CollectionReference groupMessages = Objects.requireNonNull(task.getResult())
-                        .getDocuments().get(0).getReference().collection(GROUP_COLLECTION_MEMBERS);
+                List<Group> groups = new ArrayList<>();
+                for (DocumentSnapshot snapshot : task.getResult())
+                    groups.add(snapshot.toObject(Group.class));
 
-                groupMessages.get().addOnCompleteListener(getMessagesTask ->
-                {
-                    if (getMessagesTask.isSuccessful())
-                    {
-                        List<UserProfile> groupMembersList = new ArrayList<>();
-                        if (getMessagesTask.getResult() != null)
-                        {
-                            for (DocumentSnapshot snapshot : getMessagesTask.getResult())
-                                groupMembersList.add(snapshot.toObject(UserProfile.class));
-                            result.setValue(groupMembersList);
-                        } else result.setValue(null);
-                    } else result.setValue(null);
-                });
-            } else result.setValue(null);
+                result.setValue(groups);
+            }
         });
         return result;
     }

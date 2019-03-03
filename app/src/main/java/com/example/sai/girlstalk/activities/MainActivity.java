@@ -23,12 +23,13 @@ import android.widget.Toast;
 
 import com.example.sai.girlstalk.adapters.ExpertRecyclerAdapter;
 import com.example.sai.girlstalk.models.Group;
-import com.example.sai.girlstalk.models.GroupModel;
 import com.example.sai.girlstalk.adapters.GroupRecyclerAdapter;
 import com.example.sai.girlstalk.R;
 import com.example.sai.girlstalk.models.StoryModel;
 import com.example.sai.girlstalk.adapters.StoryRecyclerAdapter;
+import com.example.sai.girlstalk.utils.FirebaseUtils;
 import com.example.sai.girlstalk.viewModels.GroupViewModel;
+import com.example.sai.girlstalk.viewModels.UserViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -47,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         RecyclerView expertsRecycler = findViewById(R.id.expertsRecycler);
 
         ArrayList<StoryModel> storylist = new ArrayList<>();
-        ArrayList<GroupModel> groupList = new ArrayList<>();
         ArrayList<StoryModel> expertList = new ArrayList<>();
         setSupportActionBar(toolbar);
         toolbar.getOverflowIcon().setColorFilter(ContextCompat.getColor(this,R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
@@ -74,20 +74,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         storyRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
         storyRecycler.setAdapter(new StoryRecyclerAdapter(storylist,this));
 
-        groupList.add(new GroupModel("https://www.anikatherapeutics.com/assets/iStock_000020443536XLarge-e1411673189414.jpg","855",
-                "Delhi","Women Rights"));
-
-        groupList.add(new GroupModel("https://www.jetairways.com/Images/forms/group-booking.jpg","235",
-                "Chennai","Online Job For Women"));
-
-        groupList.add(new GroupModel("https://static.independent.co.uk/s3fs-public/thumbnails/image/2017/06/09/11/group-photos-need-to-die.jpg?w968h681","235",
-                "Kolkata","Local Friends"));
-
-        //  groupList.add(new GroupModel("https://www.jetairways.com/Images/forms/group-booking.jpg","235",
-        //"Chennai","Online Job For Women"));
-        groupRecycler.setAdapter(new GroupRecyclerAdapter(groupList,this));
-        groupRecycler.setLayoutManager(new LinearLayoutManager(this));
-
         expertList.add(new StoryModel("https://static.boredpanda.com/blog/wp-content/uploads/2017/08/Epic-Portraits-Shot-with-an-iPhone-and-a-Big-Mac-59a54f2641195__880.jpg","ABC Kumar"));
         expertList.add(new StoryModel("http://www.keatleyphoto.com/wp-content/uploads/2016/03/John_Keatley_iPhone_portrait_Andrew_5055.jpg","XYZ Kumar"));
         expertList.add(new StoryModel("http://farm3.static.flickr.com/2792/4285995840_72a6e4ff43.jpg","Taru Sart"));
@@ -96,12 +82,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         expertsRecycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
 
         GroupViewModel groupViewModel = ViewModelProviders.of(this).get(GroupViewModel.class);
-        groupViewModel.createGroup(new Group("Sage Art","NAni","I Have Sharingan")).observe(this, isSuccessful ->
-        {
-            if (isSuccessful != null) if (isSuccessful)
-                Toast.makeText(getApplicationContext(),"Done",Toast.LENGTH_LONG).show();
-            else Toast.makeText(this, "I Failed Sigh", Toast.LENGTH_SHORT).show();
+        UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
+        userViewModel.getUser(FirebaseUtils.getInstance().getAuthInstance().getCurrentUser().getEmail()).observe(this,currentUser ->
+        {
+            if (currentUser != null)
+            {
+                groupViewModel.getUserGroups(currentUser.getProfile()).observe(this,allGroups ->
+                {
+                    if (allGroups != null)
+                    {
+                        groupRecycler.setHasFixedSize(true);
+                        groupRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        groupRecycler.setAdapter(new GroupRecyclerAdapter((ArrayList<Group>) allGroups,getApplicationContext()));
+                    }
+                });
+            }
         });
 
     }

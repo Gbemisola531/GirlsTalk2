@@ -12,8 +12,7 @@ import com.example.sai.girlstalk.repositories.GroupRepository;
 
 import java.util.List;
 
-public class GroupViewModel extends AndroidViewModel
-{
+public class GroupViewModel extends AndroidViewModel {
     private GroupRepository groupRepository;
 
     public GroupViewModel(@NonNull Application application) {
@@ -47,5 +46,10 @@ public class GroupViewModel extends AndroidViewModel
 
     public LiveData<List<UserProfile>> getAllMembers(String groupTitle) {
         return groupRepository.getAllMembers(groupTitle);
+    }
+
+    public LiveData<List<Group>> getUserGroups(UserProfile userProfile)
+    {
+        return groupRepository.getUserGroups(userProfile);
     }
 }

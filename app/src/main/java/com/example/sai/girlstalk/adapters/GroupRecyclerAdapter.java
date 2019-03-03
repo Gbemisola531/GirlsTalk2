@@ -1,6 +1,7 @@
 package com.example.sai.girlstalk.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,17 +11,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.sai.girlstalk.activities.GroupChatActivity;
+import com.example.sai.girlstalk.models.Group;
 import com.example.sai.girlstalk.models.GroupModel;
 import com.example.sai.girlstalk.R;
 
 import java.util.ArrayList;
 
-public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdapter.ViewHolder> {
+public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdapter.ViewHolder>
+{
 
-    private ArrayList<GroupModel> list;
+    private ArrayList<Group> list;
     private Context mContext;
 
-    public GroupRecyclerAdapter(ArrayList<GroupModel> list, Context context) {
+    public GroupRecyclerAdapter(ArrayList<Group> list, Context context) {
         this.list = list;
         mContext = context;
     }
@@ -35,12 +39,17 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        GroupModel current = list.get(i);
-        Glide.with(mContext).load(current.getGroupIcon()).into(viewHolder.gropThumbnail);
-        viewHolder.groupTitle.setText(current.getGroupTitle());
-        viewHolder.groupMembers.setText("Members: " + current.getGroupMembers());
-        viewHolder.groupLocation.setText("Location: " + current.getGroupLocation());
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i)
+    {
+        Group current = list.get(i);
+        viewHolder.groupTitle.setText(current.getTitle());
+
+        viewHolder.itemView.setOnClickListener(v ->
+        {
+            Intent intent = new Intent(mContext,GroupChatActivity.class);
+            intent.putExtra("GROUP TITLE",current.getTitle());
+            mContext.startActivity(intent);
+        });
     }
 
     @Override
@@ -48,16 +57,13 @@ public class GroupRecyclerAdapter extends RecyclerView.Adapter<GroupRecyclerAdap
         return list.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView gropThumbnail;
-        TextView groupTitle, groupMembers, groupLocation;
+    class ViewHolder extends RecyclerView.ViewHolder
+    {
+        TextView groupTitle;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            gropThumbnail = itemView.findViewById(R.id.groupIcon);
-            groupMembers = itemView.findViewById(R.id.groupMembers);
-            groupLocation = itemView.findViewById(R.id.groupLocation);
             groupTitle = itemView.findViewById(R.id.groupTitle);
 
         }

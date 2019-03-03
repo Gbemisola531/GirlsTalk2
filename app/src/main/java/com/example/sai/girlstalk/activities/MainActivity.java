@@ -90,12 +90,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             {
                 groupViewModel.getUserGroups(currentUser.getProfile()).observe(this,allGroups ->
                 {
-                    if (allGroups != null)
+                    groupViewModel.addMember(currentUser.getProfile(),"GRoup Title").observe(this,s ->
+                    {
+                        if (s != null) Toast.makeText(this, "IIIII", Toast.LENGTH_SHORT).show();
+                        else Toast.makeText(this, "DDDDDDd", Toast.LENGTH_SHORT).show();
+                    });
+                    /*if (allGroups != null)
                     {
                         groupRecycler.setHasFixedSize(true);
                         groupRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                         groupRecycler.setAdapter(new GroupRecyclerAdapter((ArrayList<Group>) allGroups,getApplicationContext()));
-                    }
+                    }*/
                 });
             }
         });

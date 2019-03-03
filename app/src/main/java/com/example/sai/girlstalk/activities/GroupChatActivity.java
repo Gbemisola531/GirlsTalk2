@@ -10,7 +10,12 @@ import android.widget.EditText;
 
 import com.example.sai.girlstalk.R;
 import com.example.sai.girlstalk.adapters.GroupMessagesAdapter;
+import com.example.sai.girlstalk.adapters.GroupRecyclerAdapter;
+import com.example.sai.girlstalk.models.GroupMessage;
+import com.example.sai.girlstalk.utils.FirebaseUtils;
 import com.example.sai.girlstalk.viewModels.GroupViewModel;
+import com.example.sai.girlstalk.viewModels.UserViewModel;
+import com.google.firebase.Timestamp;
 
 public class GroupChatActivity extends AppCompatActivity
 {
@@ -38,6 +43,27 @@ public class GroupChatActivity extends AppCompatActivity
                 groupMessagesList.setHasFixedSize(true);
                 groupMessagesList.setAdapter(new GroupMessagesAdapter(groupMessages,getApplicationContext()));
             }
+        });
+
+        UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+
+        sendBtn.setOnClickListener(v ->
+        {
+            userViewModel.getUser(FirebaseUtils.getInstance().getAuthInstance().getCurrentUser().getEmail()).observe(this, currentUser ->
+            {
+                GroupMessage newMessage = new GroupMessage(message.getText().toString(),Timestamp.now().toString(),currentUser.getProfile());
+                if (currentUser != null) groupViewModel.addMessage(groupTitle,newMessage)
+                        .observe(this,isSuccessful ->
+                {
+                    if (isSuccessful != null) if (isSuccessful)
+                    {
+                       GroupMessagesAdapter adapter = (GroupMessagesAdapter) groupMessagesList.getAdapter();
+                       adapter.addMessage(newMessage);
+                    }
+                });
+
+            });
+
         });
 
     }

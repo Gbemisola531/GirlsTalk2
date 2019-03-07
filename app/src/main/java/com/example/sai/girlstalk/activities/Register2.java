@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.example.sai.girlstalk.R;
 import com.example.sai.girlstalk.models.User;
+import com.example.sai.girlstalk.models.UserProfile;
 import com.example.sai.girlstalk.viewModels.UserViewModel;
 
 public class Register2 extends AppCompatActivity {
@@ -54,8 +55,10 @@ public class Register2 extends AppCompatActivity {
                 Snackbar.make(v, "Empty fields!", Snackbar.LENGTH_SHORT).show();
             else if (!passwordText.equals(confirmPasswordText))
                 Snackbar.make(v, "Passwords do not match!", Snackbar.LENGTH_SHORT).show();
-            else
-                userViewModel.signUp(new User(usernameText, emailText, passwordText)).observe(this, isSuccessful ->
+            else{
+                UserProfile profile = new UserProfile();
+                profile.setEmail(emailText);
+                userViewModel.signUp(new User(usernameText,passwordText,0.0,0,profile )).observe(this, isSuccessful ->
                 {
                     if (isSuccessful != null) if (isSuccessful) {
                         Toast.makeText(this, "A Confirmation Email Has Been Sent To You", Toast.LENGTH_SHORT).show();
@@ -63,6 +66,8 @@ public class Register2 extends AppCompatActivity {
                     } else
                         Toast.makeText(this, "An Error Occurred Please Try Again", Toast.LENGTH_SHORT).show();
                 });
+            }
+
         });
     }
 }

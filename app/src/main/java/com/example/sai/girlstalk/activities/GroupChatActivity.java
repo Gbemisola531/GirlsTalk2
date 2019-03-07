@@ -17,15 +17,15 @@ import com.example.sai.girlstalk.viewModels.GroupViewModel;
 import com.example.sai.girlstalk.viewModels.UserViewModel;
 import com.google.firebase.Timestamp;
 
-public class GroupChatActivity extends AppCompatActivity
-{
+import java.util.Objects;
+
+public class GroupChatActivity extends AppCompatActivity {
     private EditText message;
     private RecyclerView groupMessagesList;
     private Button sendBtn;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
 
@@ -35,36 +35,31 @@ public class GroupChatActivity extends AppCompatActivity
 
         String groupTitle = getIntent().getStringExtra("GROUP TITLE");
         GroupViewModel groupViewModel = ViewModelProviders.of(this).get(GroupViewModel.class);
-        groupViewModel.getAllMessages(groupTitle).observe(this,groupMessages ->
+        groupViewModel.getAllMessages(groupTitle).observe(this, groupMessages ->
         {
-            if (groupMessages != null)
-            {
+            if (groupMessages != null) {
                 groupMessagesList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 groupMessagesList.setHasFixedSize(true);
-                groupMessagesList.setAdapter(new GroupMessagesAdapter(groupMessages,getApplicationContext()));
+                groupMessagesList.setAdapter(new GroupMessagesAdapter(groupMessages, getApplicationContext()));
             }
         });
 
         UserViewModel userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
 
-        sendBtn.setOnClickListener(v ->
+        sendBtn.setOnClickListener(v -> userViewModel.getUser(Objects.requireNonNull(FirebaseUtils.getInstance().getAuthInstance()
+                .getCurrentUser()).getEmail()).observe(this, currentUser ->
         {
-            userViewModel.getUser(FirebaseUtils.getInstance().getAuthInstance().getCurrentUser().getEmail()).observe(this, currentUser ->
-            {
-                GroupMessage newMessage = new GroupMessage(message.getText().toString(),Timestamp.now().toString(),currentUser.getProfile());
-                if (currentUser != null) groupViewModel.addMessage(groupTitle,newMessage)
-                        .observe(this,isSuccessful ->
+            if (currentUser != null) {
+                GroupMessage newMessage = new GroupMessage(message.getText().toString(), Timestamp.now().toString(), currentUser.getProfile());
+                groupViewModel.addMessage(groupTitle, newMessage).observe(this, isSuccessful ->
                 {
                     if (isSuccessful != null) if (isSuccessful)
                     {
-                       GroupMessagesAdapter adapter = (GroupMessagesAdapter) groupMessagesList.getAdapter();
-                       adapter.addMessage(newMessage);
+                        GroupMessagesAdapter adapter = (GroupMessagesAdapter) groupMessagesList.getAdapter();
+                        if (adapter != null) adapter.addMessage(newMessage);
                     }
                 });
-
-            });
-
-        });
-
+            }
+        }));
     }
 }

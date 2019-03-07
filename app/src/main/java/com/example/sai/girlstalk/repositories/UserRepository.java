@@ -11,6 +11,7 @@ import com.example.sai.girlstalk.utils.FirebaseUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Objects;
 
@@ -111,11 +112,15 @@ public class UserRepository {
         firebaseUtils.getDbInstance().collection("Users").whereEqualTo("profile .email",email)
                 .get().addOnCompleteListener(task ->
         {
-            if (task.isSuccessful()) result.setValue(task.getResult().getDocuments().get(0).toObject(User.class));
+            if (task.isSuccessful())
+            {
+                QuerySnapshot userSnapshot = task.getResult();
+                if (userSnapshot != null && !userSnapshot.getDocuments().isEmpty())
+                    result.setValue(userSnapshot.getDocuments().get(0).toObject(User.class));
+            }
             else result.setValue(null);
         });
         return result;
     }
-
 
 }
